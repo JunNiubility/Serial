@@ -12,13 +12,11 @@ using System.IO;
 using System.Diagnostics;
 
 namespace Serial
-{
-    public delegate void getDataFromSerial();
+{    
     public partial class MainForm : Form
     {
         private List<byte> receiveBuffer = new List<byte>();
-        private string sendBuffer;
-        Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
+        private string sendBuffer;                
 
         public MainForm()
         {
@@ -463,7 +461,8 @@ namespace Serial
         }
 
         private void 温湿度ToolStripMenuItem_Click(object sender, EventArgs e)
-        {            
+        {
+            Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
             ShowChildFormInMDI(temperature_humidityForm, this);
         }
 
@@ -520,10 +519,6 @@ namespace Serial
             Temperature temperatureForm = new Temperature();
             ShowChildFormInMDI(temperatureForm, this);
         }
-
-        private void allTextChanged(object sender, EventArgs e)
-        {
-
-        }
+                
     }
 }

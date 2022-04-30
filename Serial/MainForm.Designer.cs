@@ -262,7 +262,6 @@ namespace Serial
             this.serialport_cbb.Name = "serialport_cbb";
             this.serialport_cbb.Size = new System.Drawing.Size(121, 28);
             this.serialport_cbb.TabIndex = 1;
-            this.serialport_cbb.TextChanged += new System.EventHandler(this.allTextChanged);
             // 
             // label1
             // 
@@ -571,21 +570,21 @@ namespace Serial
             // 自动扫描端口ToolStripMenuItem
             // 
             this.自动扫描端口ToolStripMenuItem.Name = "自动扫描端口ToolStripMenuItem";
-            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(182, 26);
             this.自动扫描端口ToolStripMenuItem.Text = "自动扫描端口";
             this.自动扫描端口ToolStripMenuItem.Click += new System.EventHandler(this.自动扫描端口ToolStripMenuItem_Click);
             // 
             // 默认串口配置ToolStripMenuItem
             // 
             this.默认串口配置ToolStripMenuItem.Name = "默认串口配置ToolStripMenuItem";
-            this.默认串口配置ToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.默认串口配置ToolStripMenuItem.Size = new System.Drawing.Size(182, 26);
             this.默认串口配置ToolStripMenuItem.Text = "默认串口配置";
             this.默认串口配置ToolStripMenuItem.Click += new System.EventHandler(this.默认串口配置ToolStripMenuItem_Click);
             // 
             // 软件信息ToolStripMenuItem
             // 
             this.软件信息ToolStripMenuItem.Name = "软件信息ToolStripMenuItem";
-            this.软件信息ToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.软件信息ToolStripMenuItem.Size = new System.Drawing.Size(182, 26);
             this.软件信息ToolStripMenuItem.Text = "软件信息";
             this.软件信息ToolStripMenuItem.Click += new System.EventHandler(this.软件信息ToolStripMenuItem_Click);
             // 

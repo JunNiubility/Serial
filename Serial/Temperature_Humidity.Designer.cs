@@ -29,6 +29,7 @@ namespace Serial
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Temperature_Humidity));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -60,6 +61,8 @@ namespace Serial
             this.自动扫描端口ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.默认端口配置toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.timerGetTime = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -78,7 +81,7 @@ namespace Serial
             this.groupBox1.Controls.Add(this.tempnow);
             this.groupBox1.Controls.Add(this.timenow);
             this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox1.Location = new System.Drawing.Point(16, 35);
+            this.groupBox1.Location = new System.Drawing.Point(17, 32);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
@@ -370,7 +373,7 @@ namespace Serial
             this.串口ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1121, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1121, 28);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -380,7 +383,7 @@ namespace Serial
             this.自动扫描端口ToolStripMenuItem,
             this.默认端口配置toolStripMenuItem});
             this.串口ToolStripMenuItem.Name = "串口ToolStripMenuItem";
-            this.串口ToolStripMenuItem.Size = new System.Drawing.Size(53, 26);
+            this.串口ToolStripMenuItem.Size = new System.Drawing.Size(53, 24);
             this.串口ToolStripMenuItem.Text = "串口";
             // 
             // 自动扫描端口ToolStripMenuItem
@@ -409,11 +412,21 @@ namespace Serial
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "存储";
             // 
+            // serialPort1
+            // 
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            // 
+            // timerGetTime
+            // 
+            this.timerGetTime.Enabled = true;
+            this.timerGetTime.Interval = 1000;
+            this.timerGetTime.Tick += new System.EventHandler(this.timerGetTime_Tick);
+            // 
             // Temperature_Humidity
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1121, 592);
+            this.ClientSize = new System.Drawing.Size(1121, 600);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -427,6 +440,7 @@ namespace Serial
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "温湿度上位机";
             this.Load += new System.EventHandler(this.Temperature_Humidity_Load);
+            this.Shown += new System.EventHandler(this.Temperature_Humidity_Shown);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -462,13 +476,15 @@ namespace Serial
         private System.Windows.Forms.ToolStripMenuItem 串口ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 自动扫描端口ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 默认端口配置toolStripMenuItem;
-        public System.Windows.Forms.CheckBox DTR_cbx;
-        public System.Windows.Forms.CheckBox RTS_cbx;
-        public System.Windows.Forms.ComboBox stop_cbb;
-        public System.Windows.Forms.ComboBox data_cbb;
-        public System.Windows.Forms.ComboBox check_cbb;
-        public System.Windows.Forms.ComboBox baundrate_cbb;
-        public System.Windows.Forms.ComboBox serialport_cbb;
-        public System.Windows.Forms.Button open_btn;
+        private System.Windows.Forms.CheckBox DTR_cbx;
+        private System.Windows.Forms.CheckBox RTS_cbx;
+        private System.Windows.Forms.ComboBox stop_cbb;
+        private System.Windows.Forms.ComboBox data_cbb;
+        private System.Windows.Forms.ComboBox check_cbb;
+        private System.Windows.Forms.ComboBox baundrate_cbb;
+        private System.Windows.Forms.ComboBox serialport_cbb;
+        private System.Windows.Forms.Button open_btn;
+        private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.Timer timerGetTime;
     }
 }
