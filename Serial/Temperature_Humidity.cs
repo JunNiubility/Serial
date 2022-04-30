@@ -13,12 +13,26 @@ namespace Serial
 {
     public partial class Temperature_Humidity : Form
     {
-        private List<byte> receiveBuffer = new List<byte>();
+        public List<double> dataT { set; get; }
+        public List<double> dataH { set; get; }
 
         public Temperature_Humidity()
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
+        }
+
+        public static void ShowChildFormInMDI(Form childFrm, Form parentFrm)//显示子窗体
+        {
+            if (Application.OpenForms[childFrm.Name] != null)
+            {
+                Application.OpenForms[childFrm.Name].Activate();
+                childFrm.Dispose();
+            }
+            else
+            {
+                childFrm.Show(parentFrm);
+            }
         }
 
         private string StringToHexString(string _str, Encoding encode)
@@ -146,30 +160,6 @@ namespace Serial
             DTR_cbx.Enabled = false;
         }
 
-        private void drawCoordinateAxis()
-        {
-            Graphics graphics = this.CreateGraphics();					//实例化窗体的Graphics类
-            Pen penAxis = new Pen(Color.Black, 1);						//设置画笔
-            Pen penFrame = new Pen(Color.Red, 2);
-            SolidBrush brushWhite = new SolidBrush(Color.White);
-            int beginX = 180;										//定义变量
-            int beginY = 36;
-            int width = 650;
-            int height = 436;
-
-            Point pointX1 = new Point(beginX, beginY + height / 2);
-            Point pointY1 = new Point(beginX + width, beginY + height / 2);
-            Point pointX2 = new Point(beginX + width / 2, beginY);
-            Point pointY2 = new Point(beginX + width / 2, beginY + height);
-
-            graphics.FillRectangle(brushWhite, beginX, beginY, width, height);
-            //调用DrawLine方法绘制两条垂直相交的直线，用来作为波形图的横纵坐标
-            graphics.DrawLine(penAxis, pointX1, pointY1);
-            graphics.DrawLine(penAxis, pointX2, pointY2);
-            graphics.DrawRectangle(penFrame, beginX, beginY, width, height);
-            graphics.Dispose();
-        }
-
         private void open_btn_Click(object sender, EventArgs e)
         {
             if (open_btn.Tag.ToString() == "true")
@@ -211,32 +201,22 @@ namespace Serial
                 stop_cbb.Enabled = true;
                 RTS_cbx.Enabled = true;
                 DTR_cbx.Enabled = true;
-            }
-
+            }            
         }
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             byte[] receiveTemp = new byte[serialPort1.BytesToRead];
             serialPort1.Read(receiveTemp, 0, receiveTemp.Length);
-            receiveBuffer.AddRange(receiveTemp);
             this.Invoke(new EventHandler(
                 delegate
                 {
-                    //if (!hexrecieve_cbx.Checked)
-                    //{
-                    //    string str = Encoding.GetEncoding("gb2312").GetString(receiveTemp);
-                    //    str = str.Replace("\0", "\\0");
-                    //    recive_tbx.AppendText(str);
-                    //}
-                    //else
-                    //{
-                    //    for (int i = 0; i < receiveTemp.Length; i++)
-                    //    {
-                    //        string str = Convert.ToString(receiveTemp[i], 16).ToUpper();
-                    //        recive_tbx.AppendText((str.Length == 1 ? "0" + str : str) + " ");//空位补"0"  
-                    //    }
-                    //}
+                    string str = Encoding.GetEncoding("gb2312").GetString(receiveTemp);
+                    str = str.Replace("\0", "\\0");
+                    string[] splitStr= { "T:", "H:" };
+                    string[] dataTH = str.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
+                    dataT.Add(Convert.ToDouble(dataTH[0]));
+                    dataH.Add(Convert.ToDouble(dataTH[1]));
                 }
             ));
         }
@@ -249,7 +229,8 @@ namespace Serial
 
         private void Temperature_Humidity_Shown(object sender, EventArgs e)
         {
-            drawCoordinateAxis();
+
         }
+
     }
 }

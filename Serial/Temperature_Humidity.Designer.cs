@@ -63,6 +63,7 @@ namespace Serial
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timerGetTime = new System.Windows.Forms.Timer(this.components);
+            this.timerShowCurve = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -373,7 +374,7 @@ namespace Serial
             this.串口ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1121, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(240, 28);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -389,14 +390,14 @@ namespace Serial
             // 自动扫描端口ToolStripMenuItem
             // 
             this.自动扫描端口ToolStripMenuItem.Name = "自动扫描端口ToolStripMenuItem";
-            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(182, 26);
+            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.自动扫描端口ToolStripMenuItem.Text = "自动扫描端口";
             this.自动扫描端口ToolStripMenuItem.Click += new System.EventHandler(this.自动扫描ToolStripMenuItem_Click);
             // 
             // 默认端口配置toolStripMenuItem
             // 
             this.默认端口配置toolStripMenuItem.Name = "默认端口配置toolStripMenuItem";
-            this.默认端口配置toolStripMenuItem.Size = new System.Drawing.Size(182, 26);
+            this.默认端口配置toolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.默认端口配置toolStripMenuItem.Text = "默认端口配置";
             this.默认端口配置toolStripMenuItem.Click += new System.EventHandler(this.默认端口配置toolStripMenuItem_Click);
             // 
@@ -426,7 +427,7 @@ namespace Serial
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1121, 600);
+            this.ClientSize = new System.Drawing.Size(240, 600);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -437,7 +438,7 @@ namespace Serial
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Temperature_Humidity";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "温湿度上位机";
             this.Load += new System.EventHandler(this.Temperature_Humidity_Load);
             this.Shown += new System.EventHandler(this.Temperature_Humidity_Shown);
@@ -486,5 +487,6 @@ namespace Serial
         private System.Windows.Forms.Button open_btn;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Timer timerGetTime;
+        private System.Windows.Forms.Timer timerShowCurve;
     }
 }

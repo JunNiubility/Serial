@@ -334,7 +334,7 @@ namespace Serial
             if (stop_btn.Tag.ToString() == "false") return;
             byte[] receiveTemp = new byte[serialPort1.BytesToRead];
             serialPort1.Read(receiveTemp, 0, receiveTemp.Length);
-            receiveBuffer.AddRange(receiveTemp);
+
             this.Invoke(new EventHandler(
                 delegate
             {
@@ -464,6 +464,8 @@ namespace Serial
         {
             Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
             ShowChildFormInMDI(temperature_humidityForm, this);
+            FrmLineSeries frmLineSeries = new FrmLineSeries();
+            ShowChildFormInMDI(frmLineSeries, temperature_humidityForm);
         }
 
         private void WaitForDate(object sender, EventArgs e)

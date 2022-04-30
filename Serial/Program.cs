@@ -15,7 +15,7 @@ namespace Serial
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Temperature_Humidity());
+            Application.Run(new MainForm());
         }
     }
 }
