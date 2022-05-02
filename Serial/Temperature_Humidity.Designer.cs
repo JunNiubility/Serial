@@ -390,14 +390,14 @@ namespace Serial
             // 自动扫描端口ToolStripMenuItem
             // 
             this.自动扫描端口ToolStripMenuItem.Name = "自动扫描端口ToolStripMenuItem";
-            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.自动扫描端口ToolStripMenuItem.Size = new System.Drawing.Size(182, 26);
             this.自动扫描端口ToolStripMenuItem.Text = "自动扫描端口";
             this.自动扫描端口ToolStripMenuItem.Click += new System.EventHandler(this.自动扫描ToolStripMenuItem_Click);
             // 
             // 默认端口配置toolStripMenuItem
             // 
             this.默认端口配置toolStripMenuItem.Name = "默认端口配置toolStripMenuItem";
-            this.默认端口配置toolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.默认端口配置toolStripMenuItem.Size = new System.Drawing.Size(182, 26);
             this.默认端口配置toolStripMenuItem.Text = "默认端口配置";
             this.默认端口配置toolStripMenuItem.Click += new System.EventHandler(this.默认端口配置toolStripMenuItem_Click);
             // 

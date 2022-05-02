@@ -26,21 +26,21 @@ namespace Serial
 
         private PlotModel _myPlotModel;
         private Random rand = new Random();//用来生成随机数
-        private double dataT { set; get; }
-        private double dataH { set; get; }
-        public FrmLineSeries()
+        private Temperature_Humidity Temperature_Humidity;
+                                           //
+        public FrmLineSeries(Temperature_Humidity HTForm)
         {
             InitializeComponent();
             System.Drawing.StringFormat.GenericTypographic.FormatFlags &= ~StringFormatFlags.LineLimit;
+            Temperature_Humidity = HTForm;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
             //定义model
             _myPlotModel = new PlotModel()
             {
-                Title = "Temp & Humi 温度",
+                Title = "温湿度实时曲线",
                 LegendTitle = "Legend",
                 LegendOrientation = LegendOrientation.Horizontal,
                 LegendPlacement = LegendPlacement.Inside,
@@ -68,12 +68,12 @@ namespace Serial
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 IntervalLength = 80,
-                Angle = 60,
+                Angle = -90,
                 IsZoomEnabled = false,
                 IsPanEnabled = false,
                 Maximum = 100,
-                Minimum = -1,
-                Title = "数值"
+                Minimum = -25,
+                Title = "温度℃/湿度%"
             };
             _myPlotModel.Axes.Add(_valueAxis);
 
@@ -84,7 +84,7 @@ namespace Serial
                 Color = OxyColors.Red,
                 LineStyle = LineStyle.Solid,
                 Y = 10,
-                Text = "Temp MAX:10"
+                Text = "Temp MIN:10"
             };
             _myPlotModel.Annotations.Add(lineTempMaxAnnotation);
 
@@ -92,7 +92,7 @@ namespace Serial
             {
                 Type = LineAnnotationType.Horizontal,
                 Y = 30,
-                Text = "Temp Min:30",
+                Text = "Temp MAX:30",
                 Color = OxyColors.Red,
                 LineStyle = LineStyle.Solid
             };
@@ -123,8 +123,8 @@ namespace Serial
             var series = new LineSeries()
             {
                 Color = OxyColors.Green,
-                StrokeThickness = 2,
-                MarkerSize = 3,
+                StrokeThickness = 1,
+                MarkerSize = 2,
                 MarkerStroke = OxyColors.DarkGreen,
                 MarkerType = MarkerType.Diamond,
                 Title = "Temp",
@@ -135,8 +135,8 @@ namespace Serial
             series = new LineSeries()
             {
                 Color = OxyColors.Blue,
-                StrokeThickness = 2,
-                MarkerSize = 3,
+                StrokeThickness = 1,
+                MarkerSize = 2,
                 MarkerStroke = OxyColors.BlueViolet,
                 MarkerType = MarkerType.Star,
                 Title = "Humi",
@@ -150,19 +150,19 @@ namespace Serial
             Task.Factory.StartNew(() =>
             {
                 while (true)
-                {
+                {     
                     var date = DateTime.Now;
                     _myPlotModel.Axes[0].Maximum = DateTimeAxis.ToDouble(date.AddSeconds(1));
 
                     var lineSer = plotView1.Model.Series[0] as LineSeries;
-                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), rand.Next(100, 300) / 10.0));
+                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), Temperature_Humidity.SendT()));
                     if (lineSer.Points.Count > 100)
                     {
                         lineSer.Points.RemoveAt(0);
                     }
 
                     lineSer = plotView1.Model.Series[1] as LineSeries;
-                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), rand.Next(350, 750) / 10.0));
+                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), Temperature_Humidity.SendH()));
                     if (lineSer.Points.Count > 100)
                     {
                         lineSer.Points.RemoveAt(0);
@@ -170,7 +170,7 @@ namespace Serial
 
                     _myPlotModel.InvalidatePlot(true);
 
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             });
         }
@@ -181,9 +181,7 @@ namespace Serial
             using (var s = File.Create(path))
             {
                 PdfExporter.Export(plotView1.Model, s, 800, 500);
-
             }
-
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)

@@ -7,14 +7,26 @@ using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Serial
 {
     public partial class Temperature_Humidity : Form
     {
-        public List<double> dataT { set; get; }
-        public List<double> dataH { set; get; }
+        private double dataT { set; get; }
+        private double dataH { set; get; }
+        public Func<double> SendT;
+        public Func<double> SendH;
+
+        private double sendTToLine()
+        {
+            return dataT;
+        }
+        private double sendHToLine()
+        {
+            return dataH;
+        }
 
         public Temperature_Humidity()
         {
@@ -160,8 +172,10 @@ namespace Serial
             DTR_cbx.Enabled = false;
         }
 
+
         private void open_btn_Click(object sender, EventArgs e)
         {
+            FrmLineSeries frmLineSeries = new FrmLineSeries(this);
             if (open_btn.Tag.ToString() == "true")
             {
                 if (serialPort1.IsOpen == false)
@@ -172,9 +186,11 @@ namespace Serial
                         open_btn.Tag = "false";
                         open_btn.Text = "关闭串口";
                         serialPort1.Open();
+                        ShowChildFormInMDI(frmLineSeries, this);
                     }
                     catch (Exception)
                     {
+                        frmLineSeries.Close();
                         MessageBox.Show(serialPort1.PortName + "打开失败！", "警告");
                         serialPort1.Close();
                         open_btn.Tag = "true";
@@ -191,17 +207,20 @@ namespace Serial
             }
             else if (open_btn.Tag.ToString() == "false")
             {
-                serialPort1.Close();
-                open_btn.Tag = "true";
-                open_btn.Text = "打开串口";
-                serialport_cbb.Enabled = true;
-                baundrate_cbb.Enabled = true;
-                data_cbb.Enabled = true;
-                check_cbb.Enabled = true;
-                stop_cbb.Enabled = true;
-                RTS_cbx.Enabled = true;
-                DTR_cbx.Enabled = true;
-            }            
+                if (Application.OpenForms[frmLineSeries.Name] == null)
+                {
+                    serialPort1.Close();
+                    open_btn.Tag = "true";
+                    open_btn.Text = "打开串口";
+                    serialport_cbb.Enabled = true;
+                    baundrate_cbb.Enabled = true;
+                    data_cbb.Enabled = true;
+                    check_cbb.Enabled = true;
+                    stop_cbb.Enabled = true;
+                    RTS_cbx.Enabled = true;
+                    DTR_cbx.Enabled = true;
+                }
+            }
         }
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -213,10 +232,22 @@ namespace Serial
                 {
                     string str = Encoding.GetEncoding("gb2312").GetString(receiveTemp);
                     str = str.Replace("\0", "\\0");
-                    string[] splitStr= { "T:", "H:" };
+                    string[] splitStr = { "T:", "H:" };
                     string[] dataTH = str.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                    dataT.Add(Convert.ToDouble(dataTH[0]));
-                    dataH.Add(Convert.ToDouble(dataTH[1]));
+                    try
+                    {
+                        dataT = Convert.ToDouble(dataTH[0]);
+                        dataH = Convert.ToDouble(dataTH[1]);
+                        temp_tbx.Text = dataTH[0];
+                        humidity_tbx.Text = dataTH[1];
+                        SendT = sendTToLine;
+                        SendH = sendHToLine;
+                    }
+                    catch
+                    {
+
+                    }
+                    
                 }
             ));
         }
@@ -229,8 +260,12 @@ namespace Serial
 
         private void Temperature_Humidity_Shown(object sender, EventArgs e)
         {
-
+            dataH = 80;
+            dataT = 25;
+            temp_tbx.Text = dataT.ToString();
+            humidity_tbx.Text = dataH.ToString();
+            SendT = sendTToLine;
+            SendH = sendHToLine;
         }
-
     }
 }

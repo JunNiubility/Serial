@@ -463,9 +463,7 @@ namespace Serial
         private void 温湿度ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
-            ShowChildFormInMDI(temperature_humidityForm, this);
-            FrmLineSeries frmLineSeries = new FrmLineSeries();
-            ShowChildFormInMDI(frmLineSeries, temperature_humidityForm);
+            ShowChildFormInMDI(temperature_humidityForm, this);            
         }
 
         private void WaitForDate(object sender, EventArgs e)
