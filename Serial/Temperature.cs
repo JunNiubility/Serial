@@ -9,8 +9,11 @@ using System.Windows.Forms;
 
 namespace Serial
 {
+    /// <summary>
+    /// 温度窗体模块待开发
+    /// </summary>
     public partial class Temperature : Form
-    {
+    {        
         public Temperature()
         {
             InitializeComponent();

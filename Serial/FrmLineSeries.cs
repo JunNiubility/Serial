@@ -19,15 +19,22 @@ using SvgExporter = OxyPlot.WindowsForms.SvgExporter;
 
 namespace Serial
 {
+    /// <summary>
+    /// 温湿度实时显示曲线窗体类
+    /// </summary>
     public partial class FrmLineSeries : Form
     {
+        #region 字段
         private DateTimeAxis _dateAxis;//X轴
         private LinearAxis _valueAxis;//Y轴
+        private PlotModel _myPlotModel;//坐标轴
+        private Temperature_Humidity Temperature_Humidity;//温湿度串口配置
+        #endregion
 
-        private PlotModel _myPlotModel;
-        private Random rand = new Random();//用来生成随机数
-        private Temperature_Humidity Temperature_Humidity;
-                                           //
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="HTForm"></param>
         public FrmLineSeries(Temperature_Humidity HTForm)
         {
             InitializeComponent();
@@ -35,6 +42,12 @@ namespace Serial
             Temperature_Humidity = HTForm;
         }
 
+        #region 事件
+        /// <summary>
+        /// 窗体初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
             //定义model
@@ -174,19 +187,27 @@ namespace Serial
                 }
             });
         }
-
+        /// <summary>
+        /// 保存为PDF功能事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            var path = Path.Combine(Environment.CurrentDirectory, "aa.pdf");
+            var path = Path.Combine(Environment.CurrentDirectory, "data.pdf");
             using (var s = File.Create(path))
             {
                 PdfExporter.Export(plotView1.Model, s, 800, 500);
             }
         }
-
+        /// <summary>
+        /// 保存为图片功能事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            var path = Path.Combine(Environment.CurrentDirectory, "aa.png");
+            var path = Path.Combine(Environment.CurrentDirectory, "data.png");
             using (var s = File.Create(path))
 
             {
@@ -198,5 +219,6 @@ namespace Serial
 
             }
         }
+        #endregion
     }
 }

@@ -12,18 +12,30 @@ using System.IO;
 using System.Diagnostics;
 
 namespace Serial
-{    
+{
     public partial class MainForm : Form
     {
-        private List<byte> receiveBuffer = new List<byte>();
-        private string sendBuffer;                
+        #region 字段
+        private List<byte> receiveBuffer = new List<byte>();//接收串口数据
+        private string sendBuffer;//发送串口数据                
+        #endregion
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
         }
-        public static void ShowChildFormInMDI(Form childFrm, Form parentFrm)//显示子窗体
+
+        #region 窗体
+        /// <summary>
+        /// 显示子窗体
+        /// </summary>
+        /// <param name="childFrm">子窗体</param>
+        /// <param name="parentFrm">父窗体</param>
+        public static void ShowChildFormInMDI(Form childFrm, Form parentFrm)
         {
             if (Application.OpenForms[childFrm.Name] != null)
             {
@@ -35,10 +47,17 @@ namespace Serial
                 childFrm.Show(parentFrm);
             }
         }
-
+        #endregion
+        #region 进制转换函数
+        /// <summary>
+        /// 将encode编码的字符串str转为十六进制Hex的字符串
+        /// </summary>
+        /// <param name="_str">字符串</param>
+        /// <param name="encode">字符串编码</param>
+        /// <returns></returns>
         private string StringToHexString(string _str, Encoding encode)
         {
-            
+
             //将字符串转换成字节数组。
             byte[] buffer = encode.GetBytes(_str);
             //定义一个string类型的变量，用于存储转换后的值。
@@ -50,7 +69,12 @@ namespace Serial
             }
             return result;
         }
-
+        /// <summary>
+        /// 将十六进制的字符串转为encode编码格式的字符串
+        /// </summary>
+        /// <param name="hex">十六进制字符串</param>
+        /// <param name="encode">字符串编码</param>
+        /// <returns></returns>
         private string HexStringToString(string hex, Encoding encode)
         {
             //去掉空格
@@ -65,20 +89,12 @@ namespace Serial
             //返回指定编码格式的字符串
             return encode.GetString(buffer);
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            for (int i = 0; i <= 255; i++)
-            {
-                serialport_cbb.Items.Add("COM" + i.ToString());
-            }
-            serialport_cbb.Text = serialport_cbb.Items[0].ToString();
-            baundrate_cbb.Text = "9600";
-            check_cbb.Text = "0校验";
-            data_cbb.Text = "8";
-            stop_cbb.Text = "1位";
-        }
-
+        #endregion
+        #region 初始化  
+        /// <summary>
+        /// 串口初始设置
+        /// </summary>
+        /// <param name="serialPort">串口</param>
         private void makeSerialPort(SerialPort serialPort)
         {
             serialPort.PortName = serialport_cbb.Text;
@@ -134,7 +150,30 @@ namespace Serial
             RTS_cbx.Enabled = false;
             DTR_cbx.Enabled = false;
         }
-
+        #endregion
+        #region 事件
+        /// <summary>
+        /// 窗体初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            for (int i = 0; i <= 255; i++)
+            {
+                serialport_cbb.Items.Add("COM" + i.ToString());
+            }
+            serialport_cbb.Text = serialport_cbb.Items[0].ToString();
+            baundrate_cbb.Text = "9600";
+            check_cbb.Text = "0校验";
+            data_cbb.Text = "8";
+            stop_cbb.Text = "1位";
+        }
+        /// <summary>
+        /// 打开按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void open_btn_Click(object sender, EventArgs e)
         {
             if (open_btn.Tag.ToString() == "true")
@@ -146,7 +185,7 @@ namespace Serial
                         makeSerialPort(serialPort1);
                         open_btn.Tag = "false";
                         open_btn.Text = "关闭串口";
-                        serialPort1.Open();                        
+                        serialPort1.Open();
                     }
                     catch (Exception)
                     {
@@ -178,7 +217,11 @@ namespace Serial
                 DTR_cbx.Enabled = true;
             }
         }
-
+        /// <summary>
+        /// 自动扫描端口事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 自动扫描端口ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             serialport_cbb.Items.Clear();
@@ -191,13 +234,21 @@ namespace Serial
             }
             serialport_cbb.Text = serialport_cbb.Items[0].ToString();
         }
-
+        /// <summary>
+        /// 清除按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void manalclear_btn_Click(object sender, EventArgs e)
         {
             receiveBuffer.Clear();
             recive_tbx.Text = "";
         }
-
+        /// <summary>
+        /// 停止按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void stop_btn_Click(object sender, EventArgs e)
         {
             if (stop_btn.Tag.ToString() == "true")
@@ -211,7 +262,11 @@ namespace Serial
                 stop_btn.Text = "暂停";
             }
         }
-
+        /// <summary>
+        /// 保存按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void save_btn_Click(object sender, EventArgs e)
         {
             if (recievefile_tbx.Text != "")
@@ -244,7 +299,11 @@ namespace Serial
                 MessageBox.Show("文件路径不能为空");
             }
         }
-
+        /// <summary>
+        /// 选择文件按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void coosefile_btn_Click(object sender, EventArgs e)
         {
             try
@@ -258,7 +317,11 @@ namespace Serial
 
             }
         }
-
+        /// <summary>
+        /// 手动发送按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void manalsend_btn_Click(object sender, EventArgs e)
         {
             byte[] Data = new byte[1];
@@ -309,12 +372,20 @@ namespace Serial
                 }
             }
         }
-
+        /// <summary>
+        /// 清除发送按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void clearsend_btn_Click(object sender, EventArgs e)
         {
             send_tbx.Text = "";
         }
-
+        /// <summary>
+        /// 打开文件按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openfile_btn_Click(object sender, EventArgs e)
         {
             try
@@ -328,7 +399,11 @@ namespace Serial
 
             }
         }
-
+        /// <summary>
+        /// 串口接收数据事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (stop_btn.Tag.ToString() == "false") return;
@@ -355,7 +430,11 @@ namespace Serial
             }
             ));
         }
-
+        /// <summary>
+        /// Hex选择框接收变化事件事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void hexrecieve_cbx_CheckedChanged(object sender, EventArgs e)
         {
             if (recive_tbx.Text == "") return;
@@ -368,7 +447,11 @@ namespace Serial
                 recive_tbx.Text = StringToHexString(recive_tbx.Text, Encoding.GetEncoding("gb2312")).ToUpper();
             }
         }
-
+        /// <summary>
+        /// 自动清除复选框变化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void autoclear_cbx_CheckedChanged(object sender, EventArgs e)
         {
             if (autoclear_cbx.Checked)
@@ -376,7 +459,11 @@ namespace Serial
             else
                 autoclearTime.Stop();
         }
-
+        /// <summary>
+        /// 发送区文字改变事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void send_tbx_Leave(object sender, EventArgs e)
         {
             sendBuffer = "";
@@ -394,7 +481,11 @@ namespace Serial
             catch
             { }
         }
-
+        /// <summary>
+        /// Hex选择框发送改变时间
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void hexsend_cbx_CheckedChanged(object sender, EventArgs e)
         {
             if (send_tbx.Text == "") return;
@@ -412,7 +503,11 @@ namespace Serial
             catch
             { }
         }
-
+        /// <summary>
+        /// 发送文件按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void sendfile_btn_Click(object sender, EventArgs e)
         {
             try
@@ -431,7 +526,11 @@ namespace Serial
 
             }
         }
-
+        /// <summary>
+        /// 默认串口配置事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 默认串口配置ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             serialport_cbb.Text = serialport_cbb.Items[0].ToString();
@@ -449,7 +548,11 @@ namespace Serial
             sendfile_tbx.Text = "";
             autosend_tbx.Text = "";
         }
-
+        /// <summary>
+        /// 软件信息事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 软件信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("本串口助手功能：\r\n" +
@@ -459,18 +562,30 @@ namespace Serial
                 "当前版本功能有限，更多功能敬请期待",
                 "软件信息");
         }
-
+        /// <summary>
+        /// 湿度功能事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 温湿度ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
-            ShowChildFormInMDI(temperature_humidityForm, this);            
+            ShowChildFormInMDI(temperature_humidityForm, this);
         }
-
+        /// <summary>
+        /// 等待更新事件提示
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WaitForDate(object sender, EventArgs e)
         {
             MessageBox.Show("本功能暂无，敬请期待！", "提示");
         }
-
+        /// <summary>
+        /// 使用帮助事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 使用帮助ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ProcessStartInfo info = new ProcessStartInfo();
@@ -479,7 +594,11 @@ namespace Serial
             info.WindowStyle = ProcessWindowStyle.Normal;
             Process pro = Process.Start(info);
         }
-
+        /// <summary>
+        /// 自动清除的时间触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void autoclearTime_Tick(object sender, EventArgs e)
         {
             if (recive_tbx.Text.Length >= 4096)
@@ -488,14 +607,22 @@ namespace Serial
                 recive_tbx.Text = "";
             }
         }
-
+        /// <summary>
+        /// 自动发送的时间触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void autosend_Time_Tick(object sender, EventArgs e)
         {
-            manalsend_btn_Click(sender,e);
+            manalsend_btn_Click(sender, e);
         }
-
+        /// <summary>
+        /// 自动发送选择框变化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void autosend_cbx_CheckedChanged(object sender, EventArgs e)
-        {            
+        {
             if (autosend_cbx.Checked)
             {
                 if (autosend_tbx.Text == "")
@@ -508,17 +635,21 @@ namespace Serial
                 {
                     autosend_Time.Interval = Convert.ToInt32(autosend_tbx.Text);
                     autosend_Time.Start();
-                }                    
+                }
             }
             else
                 autosend_Time.Stop();
         }
-
+        /// <summary>
+        /// 湿度功能事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 温度ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Temperature temperatureForm = new Temperature();
             ShowChildFormInMDI(temperatureForm, this);
         }
-                
+        #endregion
     }
 }

@@ -12,29 +12,50 @@ using System.Windows.Forms;
 
 namespace Serial
 {
+    /// <summary>
+    /// 温湿度窗体模块
+    /// </summary>
     public partial class Temperature_Humidity : Form
     {
-        private double dataT { set; get; }
-        private double dataH { set; get; }
-        public Func<double> SendT;
-        public Func<double> SendH;
+        #region 字段
+        private double dataT { set; get; }//温度数据
+        private double dataH { set; get; }//湿度数据
+        public Func<double> SendT;//发送温度数据委托
+        public Func<double> SendH;//发送湿度数据委托
+        #endregion
 
+        /// <summary>
+        /// 发送温度函数
+        /// </summary>
+        /// <returns></returns>
         private double sendTToLine()
         {
             return dataT;
         }
+        /// <summary>
+        /// 发送湿度函数
+        /// </summary>
+        /// <returns></returns>
         private double sendHToLine()
         {
             return dataH;
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public Temperature_Humidity()
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
         }
 
-        public static void ShowChildFormInMDI(Form childFrm, Form parentFrm)//显示子窗体
+        /// <summary>
+        /// 显示子窗体函数
+        /// </summary>
+        /// <param name="childFrm">子窗体</param>
+        /// <param name="parentFrm">父窗体</param>
+        public static void ShowChildFormInMDI(Form childFrm, Form parentFrm)
         {
             if (Application.OpenForms[childFrm.Name] != null)
             {
@@ -47,6 +68,7 @@ namespace Serial
             }
         }
 
+        #region 进制转换
         private string StringToHexString(string _str, Encoding encode)
         {
 
@@ -61,7 +83,6 @@ namespace Serial
             }
             return result;
         }
-
         private string HexStringToString(string hex, Encoding encode)
         {
             //去掉空格
@@ -76,6 +97,13 @@ namespace Serial
             //返回指定编码格式的字符串
             return encode.GetString(buffer);
         }
+        #endregion
+        #region 事件
+        /// <summary>
+        /// 温湿度窗体初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Temperature_Humidity_Load(object sender, EventArgs e)
         {
             datelbl.Text = DateTime.Now.ToString("yyyy-MM-dd");
@@ -91,7 +119,11 @@ namespace Serial
             data_cbb.Text = "8";
             stop_cbb.Text = "1位";
         }
-
+        /// <summary>
+        /// 自动扫描事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 自动扫描ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             serialport_cbb.Items.Clear();
@@ -104,7 +136,11 @@ namespace Serial
             }
             serialport_cbb.Text = serialport_cbb.Items[0].ToString();
         }
-
+        /// <summary>
+        /// 默认端口配置事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 默认端口配置toolStripMenuItem_Click(object sender, EventArgs e)
         {
             serialport_cbb.Text = serialport_cbb.Items[0].ToString();
@@ -115,7 +151,10 @@ namespace Serial
             RTS_cbx.CheckState = CheckState.Unchecked;
             DTR_cbx.CheckState = CheckState.Unchecked;
         }
-
+        /// <summary>
+        /// 串口初始化函数
+        /// </summary>
+        /// <param name="serialPort"></param>
         private void makeSerialPort(SerialPort serialPort)
         {
             serialPort.PortName = serialport_cbb.Text;
@@ -172,7 +211,11 @@ namespace Serial
             DTR_cbx.Enabled = false;
         }
 
-
+        /// <summary>
+        /// 打开按键事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void open_btn_Click(object sender, EventArgs e)
         {
             FrmLineSeries frmLineSeries = new FrmLineSeries(this);
@@ -222,7 +265,11 @@ namespace Serial
                 }
             }
         }
-
+        /// <summary>
+        /// 串口接收数据事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             byte[] receiveTemp = new byte[serialPort1.BytesToRead];
@@ -247,17 +294,25 @@ namespace Serial
                     {
 
                     }
-                    
+
                 }
             ));
         }
-
+        /// <summary>
+        /// 实时时间更新触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timerGetTime_Tick(object sender, EventArgs e)
         {
             datelbl.Text = DateTime.Now.ToString("yyyy-MM-dd");
             time_lbl.Text = DateTime.Now.ToString("HH:mm:ss");
         }
-
+        /// <summary>
+        /// 温湿度实时曲线初值初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Temperature_Humidity_Shown(object sender, EventArgs e)
         {
             dataH = 80;
@@ -267,5 +322,6 @@ namespace Serial
             SendT = sendTToLine;
             SendH = sendHToLine;
         }
+        #endregion
     }
 }
