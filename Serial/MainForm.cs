@@ -10,6 +10,7 @@ using System.IO.Ports;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Serial
 {
@@ -18,6 +19,9 @@ namespace Serial
         #region 字段
         private List<byte> receiveBuffer = new List<byte>();//接收串口数据
         private string sendBuffer;//发送串口数据                
+        public delegate void Displaydelegate(byte[] InputBuf);
+        Byte[] OutputBuf = new Byte[128];
+        public Displaydelegate disp_delegate;
         #endregion
 
         /// <summary>
@@ -27,7 +31,26 @@ namespace Serial
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
+            //disp_delegate = new Displaydelegate(DispUI);
         }
+        //public void DispUI(byte[] InputBuf)
+        //{
+        //    if (!hexrecieve_cbx.Checked)
+        //    {
+        //        string str = Encoding.ASCII.GetString(InputBuf);
+        //        //str = str.Replace("\0", "\\0");
+        //        recive_tbx.AppendText(str);
+        //    }
+        //    else
+        //    {
+        //        string str = string.Empty;
+        //        for (int i = 0; i < InputBuf.Length; i++)
+        //        {
+        //            str += InputBuf[i].ToString("X2").ToUpper() + " ";
+        //        }
+        //        recive_tbx.AppendText(str);//空位补"0"  
+        //    }
+        //}
 
         #region 窗体
         /// <summary>
@@ -103,7 +126,7 @@ namespace Serial
             switch (check_cbb.Text.ToString())
             {
                 case "0校验":
-                    serialPort.Parity = Parity.Space;
+                    serialPort.Parity = Parity.None;
                     break;
                 case "1校验":
                     serialPort.Parity = Parity.Mark;
@@ -115,7 +138,7 @@ namespace Serial
                     serialPort.Parity = Parity.Even;
                     break;
                 case "无校验":
-                    serialPort.Parity = Parity.None;
+                    serialPort.Parity = Parity.Space;
                     break;
                 default:
                     break;
@@ -167,7 +190,7 @@ namespace Serial
             baundrate_cbb.Text = "9600";
             check_cbb.Text = "0校验";
             data_cbb.Text = "8";
-            stop_cbb.Text = "1位";
+            stop_cbb.Text = "1位";            
         }
         /// <summary>
         /// 打开按键事件
@@ -183,9 +206,11 @@ namespace Serial
                     try
                     {
                         makeSerialPort(serialPort1);
+                        serialPort1.ReceivedBytesThreshold = 1;
                         open_btn.Tag = "false";
                         open_btn.Text = "关闭串口";
                         serialPort1.Open();
+                        serialPort1.DiscardInBuffer();
                     }
                     catch (Exception)
                     {
@@ -406,29 +431,107 @@ namespace Serial
         /// <param name="e"></param>
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (stop_btn.Tag.ToString() == "false") return;
-            byte[] receiveTemp = new byte[serialPort1.BytesToRead];
-            serialPort1.Read(receiveTemp, 0, receiveTemp.Length);
+            //if (stop_btn.Tag.ToString() == "false") return;
+            //Thread.Sleep(200);
+            //this.Invoke(new Action(() =>
+            //{
+            //    string rec_str = "";
+            //    int bytes_count = serialPort1.BytesToRead;
+            //    byte[] byte_list = new byte[bytes_count];
+            //    serialPort1.Read(byte_list, 0, bytes_count);
+            //    foreach (var i in byte_list)
+            //    {
+            //        rec_str += (char)i;
+            //    }
+            //    recive_tbx.Text += rec_str;
 
-            this.Invoke(new EventHandler(
-                delegate
+            //    serialPort1.DiscardInBuffer();    //丢弃接收缓冲区数据
+            //}));
+
+
+            //Byte[] InputBuf = new Byte[serialPort1.BytesToRead];
+            //try
+            //{
+            //    serialPort1.Read(InputBuf, 0, InputBuf.Length);      
+            //    System.Threading.Thread.Sleep(100);
+            //    this.Invoke(disp_delegate, InputBuf);
+            //}
+            //catch
+            //{ }
+            //if (!hexrecieve_cbx.Checked)//如果接受模式为字符模式
+            //{
+            //    string str = string.Empty;
+            //    while (this.serialPort1.BytesToRead > 0)
+            //    {
+            //        str += this.serialPort1.ReadExisting();  //数据读取,直到读完缓冲区数据
+            //    }                
+            //    recive_tbx.AppendText(str);
+            //}
+            //else
+            //{ //如果接收模式为数据接收
+            //    byte[] data = new byte[serialPort1.BytesToRead];
+            //    serialPort1.Read(data, 0, data.Length);
+            //    foreach (byte menber in data)                                                   //遍历用法
+            //    {
+            //        string str = Convert.ToString(menber, 16).ToUpper();
+            //        recive_tbx.AppendText(str.Length == 1 ? "0" + str : str + " ");
+            //    }
+            //}
+            if (stop_btn.Tag.ToString() == "false") return;
+            try
             {
-                if (!hexrecieve_cbx.Checked)
+                byte[] receiveTemp = new byte[serialPort1.BytesToRead];
+                serialPort1.Read(receiveTemp, 0, receiveTemp.Length);
+                foreach (byte item in receiveTemp)
                 {
-                    string str = Encoding.GetEncoding("gb2312").GetString(receiveTemp);
-                    str = str.Replace("\0", "\\0");
-                    recive_tbx.AppendText(str);
-                }
-                else
-                {
-                    for (int i = 0; i < receiveTemp.Length; i++)
-                    {
-                        string str = Convert.ToString(receiveTemp[i], 16).ToUpper();
-                        recive_tbx.AppendText((str.Length == 1 ? "0" + str : str) + " ");//空位补"0"  
-                    }
+                    Deal_RcData(item);
                 }
             }
-            ));
+            catch
+            { }
+
+            //this.Invoke(new EventHandler(
+            //    delegate
+            //{
+            //    if (!hexrecieve_cbx.Checked)
+            //    {
+            //        string str = Encoding.ASCII.GetString(receiveTemp);
+            //        //str = str.Replace("\0", "\\0");
+            //        recive_tbx.AppendText(str);
+            //    }
+            //    else
+            //    {
+            //        string str = string.Empty;
+            //        for (int i = 0; i < receiveTemp.Length; i++)
+            //        {
+            //            str += receiveTemp[i].ToString("X2").ToUpper();
+            //            recive_tbx.AppendText((str.Length == 1 ? "0" + str : str) + " ");//空位补"0"  
+            //        }
+            //    }
+            //}
+            //));
+        }
+        private void Deal_RcData(byte data)
+        {
+            byte[] Resoursedata = { data };
+            StringBuilder readstr = new StringBuilder();
+            if (hexrecieve_cbx.Checked == true)
+            {
+                readstr.Append(string.Format("{0:X2}", Resoursedata.ElementAt(0)));
+            }
+            else
+            {
+                readstr.Append(System.Text.Encoding.ASCII.GetString(Resoursedata, 0, Resoursedata.Count()));
+            }
+            EventHandler DelUpdata = delegate
+            {
+                recive_tbx.AppendText(readstr.ToString());
+                if (autoclear_cbx.Checked == true && recive_tbx.Text.Length >= 512)
+                {
+                    recive_tbx.Clear();
+                }
+            };
+            this.Invoke(DelUpdata);
         }
         /// <summary>
         /// Hex选择框接收变化事件事件
@@ -440,11 +543,11 @@ namespace Serial
             if (recive_tbx.Text == "") return;
             if (!hexrecieve_cbx.Checked)
             {
-                recive_tbx.Text = HexStringToString(recive_tbx.Text, Encoding.GetEncoding("gb2312"));
+                recive_tbx.Text = HexStringToString(recive_tbx.Text, Encoding.ASCII);
             }
             else
             {
-                recive_tbx.Text = StringToHexString(recive_tbx.Text, Encoding.GetEncoding("gb2312")).ToUpper();
+                recive_tbx.Text = StringToHexString(recive_tbx.Text, Encoding.ASCII).ToUpper();
             }
         }
         /// <summary>
@@ -601,7 +704,7 @@ namespace Serial
         /// <param name="e"></param>
         private void autoclearTime_Tick(object sender, EventArgs e)
         {
-            if (recive_tbx.Text.Length >= 4096)
+            if (recive_tbx.Text.Length >= 512)
             {
                 receiveBuffer.Clear();
                 recive_tbx.Text = "";
