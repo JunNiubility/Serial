@@ -118,6 +118,7 @@ namespace Serial
             check_cbb.Text = "0校验";
             data_cbb.Text = "8";
             stop_cbb.Text = "1位";
+            自动扫描ToolStripMenuItem_Click(sender, e);
         }
         /// <summary>
         /// 自动扫描事件
@@ -163,7 +164,7 @@ namespace Serial
             switch (check_cbb.Text.ToString())
             {
                 case "0校验":
-                    serialPort.Parity = Parity.Space;
+                    serialPort.Parity = Parity.None;
                     break;
                 case "1校验":
                     serialPort.Parity = Parity.Mark;
@@ -175,7 +176,7 @@ namespace Serial
                     serialPort.Parity = Parity.Even;
                     break;
                 case "无校验":
-                    serialPort.Parity = Parity.None;
+                    serialPort.Parity = Parity.Space;
                     break;
                 default:
                     break;

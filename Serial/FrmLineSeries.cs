@@ -80,13 +80,13 @@ namespace Serial
             {
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                IntervalLength = 80,
+                IntervalLength = 40,
                 Angle = -90,
                 IsZoomEnabled = false,
                 IsPanEnabled = false,
                 Maximum = 100,
                 Minimum = -25,
-                Title = "温度℃/湿度%"
+                Title = "温度 ℃ / 湿度 %"
             };
             _myPlotModel.Axes.Add(_valueAxis);
 
@@ -94,10 +94,10 @@ namespace Serial
             var lineTempMaxAnnotation = new OxyPlot.Annotations.LineAnnotation()
             {
                 Type = LineAnnotationType.Horizontal,
-                Color = OxyColors.Red,
-                LineStyle = LineStyle.Solid,
+                Color = OxyColors.Blue,
+                LineStyle = LineStyle.LongDashDot,
                 Y = 10,
-                Text = "Temp MIN:10"
+                Text = "Tmin:10",
             };
             _myPlotModel.Annotations.Add(lineTempMaxAnnotation);
 
@@ -105,9 +105,9 @@ namespace Serial
             {
                 Type = LineAnnotationType.Horizontal,
                 Y = 30,
-                Text = "Temp MAX:30",
+                Text = "Tmax:30",
                 Color = OxyColors.Red,
-                LineStyle = LineStyle.Solid
+                LineStyle = LineStyle.LongDashDot,
             };
             _myPlotModel.Annotations.Add(lineTempMinAnnotation);
 
@@ -115,10 +115,9 @@ namespace Serial
             {
                 Type = LineAnnotationType.Horizontal,
                 Color = OxyColors.Red,
-                LineStyle = LineStyle.Solid,
-                //lineMaxAnnotation.MaximumX = 0.8;
+                LineStyle = LineStyle.LongDashDot,
                 Y = 75,
-                Text = "Humi MAX:75"
+                Text = "Hmax:75",
             };
             _myPlotModel.Annotations.Add(lineHumiMaxAnnotation);
 
@@ -126,9 +125,9 @@ namespace Serial
             {
                 Type = LineAnnotationType.Horizontal,
                 Y = 35,
-                Text = "Humi Min:35",
-                Color = OxyColors.Red,
-                LineStyle = LineStyle.Solid
+                Text = "Hmin:35",
+                Color = OxyColors.Blue,
+                LineStyle = LineStyle.LongDashDot,
             };
             _myPlotModel.Annotations.Add(lineHumiMinAnnotation);
 
@@ -136,11 +135,11 @@ namespace Serial
             var series = new LineSeries()
             {
                 Color = OxyColors.Green,
-                StrokeThickness = 1,
-                MarkerSize = 2,
+                StrokeThickness = 2,
+                MarkerSize = 3,
                 MarkerStroke = OxyColors.DarkGreen,
                 MarkerType = MarkerType.Diamond,
-                Title = "Temp",
+                Title = "温度",
                 Smooth = true
             };
             _myPlotModel.Series.Add(series);
@@ -148,11 +147,11 @@ namespace Serial
             series = new LineSeries()
             {
                 Color = OxyColors.Blue,
-                StrokeThickness = 1,
-                MarkerSize = 2,
+                StrokeThickness = 2,
+                MarkerSize = 3,
                 MarkerStroke = OxyColors.BlueViolet,
-                MarkerType = MarkerType.Star,
-                Title = "Humi",
+                MarkerType = MarkerType.Triangle,
+                Title = "湿度",
                 Smooth = true
             };
             _myPlotModel.Series.Add(series);
@@ -163,7 +162,7 @@ namespace Serial
             Task.Factory.StartNew(() =>
             {
                 while (true)
-                {     
+                {
                     var date = DateTime.Now;
                     _myPlotModel.Axes[0].Maximum = DateTimeAxis.ToDouble(date.AddSeconds(1));
 
@@ -183,7 +182,7 @@ namespace Serial
 
                     _myPlotModel.InvalidatePlot(true);
 
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
             });
         }
