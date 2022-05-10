@@ -136,6 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\串口.ico" />
+    <Content Include="Resources\OxyPlot.dll" />
+    <Content Include="Resources\OxyPlot.WindowsForms.dll" />
     <Content Include="串口.ico" />
   </ItemGroup>
   <ItemGroup>
