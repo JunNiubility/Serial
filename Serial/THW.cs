@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,36 +16,20 @@ namespace Serial
     /// <summary>
     /// 温湿度窗体模块
     /// </summary>
-    public partial class Temperature_Humidity : Form
+    public partial class THW : Form
     {
-        #region 字段
-        private double dataT { set; get; }//温度数据
-        private double dataH { set; get; }//湿度数据
-        public Func<double> SendT;//发送温度数据委托
-        public Func<double> SendH;//发送湿度数据委托
+        #region 字段        
+        private DataToSave dataToSave { set; get; }
+        public Func<DataToSave> SendData;//发送数据委托
         #endregion
-
-        /// <summary>
-        /// 发送温度函数
-        /// </summary>
-        /// <returns></returns>
-        private double sendTToLine()
+        private DataToSave SendToForm()
         {
-            return dataT;
+            return dataToSave;
         }
-        /// <summary>
-        /// 发送湿度函数
-        /// </summary>
-        /// <returns></returns>
-        private double sendHToLine()
-        {
-            return dataH;
-        }
-
         /// <summary>
         /// 构造函数
         /// </summary>
-        public Temperature_Humidity()
+        public THW()
         {
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
@@ -263,6 +248,19 @@ namespace Serial
                     stop_cbb.Enabled = true;
                     RTS_cbx.Enabled = true;
                     DTR_cbx.Enabled = true;
+                    try
+                    {
+
+                    }
+                    catch (Exception)
+                    {
+
+                        throw;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("请先关闭实时显示界面", "警告");
                 }
             }
         }
@@ -279,17 +277,44 @@ namespace Serial
                 delegate
                 {
                     string str = Encoding.GetEncoding("gb2312").GetString(receiveTemp);
+                    //str = "T-P:23.5H-P:56%S-P:32\r\nT-M:43.2H-M:58%S-M:9.8D-M:211TIME:95s";
                     str = str.Replace("\0", "\\0");
-                    string[] splitStr = { "T:", "H:" };
-                    string[] dataTH = str.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
+                    string[] splitStr = { "T-P:", "H-P:", "S-P:", "T-M:", "H-M:", "%S-M:", "D-M:", "TIME:", "s" };
+                    string[] dataTHW = str.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
                     try
                     {
-                        dataT = Convert.ToDouble(dataTH[0]);
-                        dataH = Convert.ToDouble(dataTH[1]);
-                        temp_tbx.Text = dataTH[0];
-                        humidity_tbx.Text = dataTH[1];
-                        SendT = sendTToLine;
-                        SendH = sendHToLine;
+                        dataToSave.temperature = Convert.ToDouble(dataTHW[3]);
+                        dataToSave.humidity = Convert.ToDouble(dataTHW[4]);
+                        dataToSave.windSpeed = Convert.ToDouble(dataTHW[5]);
+                        dataToSave.windDirection = Convert.ToDouble(dataTHW[6]);
+                        dataToSave.countSecond = (int)Convert.ToInt32(dataTHW[7]);
+                        dataToSave.nowTime = DateTime.Now.ToString();
+
+                        dataToSave.windDirection += 360;
+                        dataToSave.windDirection %= 360;
+                        double dataWD = dataToSave.windDirection;
+
+                        if ((337 < dataWD && dataWD <= 360) || (0 <= dataWD && dataWD <= 22))
+                            wd_tbx.Text = "北风吹";
+                        else if (22 < dataWD && dataWD <= 67)
+                            wd_tbx.Text = "东北风";
+                        else if (67 < dataWD && dataWD <= 112)
+                            wd_tbx.Text = "东风吹";
+                        else if (112 < dataWD && dataWD <= 157)
+                            wd_tbx.Text = "东南风";
+                        else if (157 < dataWD && dataWD <= 202)
+                            wd_tbx.Text = "南风吹";
+                        else if (202 < dataWD && dataWD <= 247)
+                            wd_tbx.Text = "西南风";
+                        else if (247 < dataWD && dataWD <= 292)
+                            wd_tbx.Text = "西风吹";
+                        else if (292 < dataWD && dataWD <= 337)
+                            wd_tbx.Text = "西北风";
+
+                        temp_tbx.Text = dataToSave.temperature.ToString();
+                        humidity_tbx.Text = dataToSave.humidity.ToString();
+                        ws_tbx.Text = dataToSave.windSpeed.ToString();
+                        time_lbl.Text = dataToSave.nowTime;
                     }
                     catch
                     {
@@ -316,12 +341,12 @@ namespace Serial
         /// <param name="e"></param>
         private void Temperature_Humidity_Shown(object sender, EventArgs e)
         {
-            dataH = 80;
-            dataT = 25;
-            temp_tbx.Text = dataT.ToString();
-            humidity_tbx.Text = dataH.ToString();
-            SendT = sendTToLine;
-            SendH = sendHToLine;
+            dataToSave = new DataToSave(191, DateTime.Now.ToString(), 25, 80, 0, 3.4);
+            SendData = SendToForm;
+            temp_tbx.Text = dataToSave.temperature.ToString();
+            humidity_tbx.Text = dataToSave.humidity.ToString();
+            wd_tbx.Text = "北风吹";
+            ws_tbx.Text = dataToSave.windSpeed.ToString();
         }
         #endregion
     }

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -28,18 +29,18 @@ namespace Serial
         private DateTimeAxis _dateAxis;//X轴
         private LinearAxis _valueAxis;//Y轴
         private PlotModel _myPlotModel;//坐标轴
-        private Temperature_Humidity Temperature_Humidity;//温湿度串口配置
+        private THW THWMethod;//温湿度串口配置
         #endregion
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="HTForm"></param>
-        public FrmLineSeries(Temperature_Humidity HTForm)
+        /// <param name="THWForm"></param>
+        public FrmLineSeries(THW THWForm)
         {
             InitializeComponent();
             System.Drawing.StringFormat.GenericTypographic.FormatFlags &= ~StringFormatFlags.LineLimit;
-            Temperature_Humidity = HTForm;
+            THWMethod = THWForm;
         }
 
         #region 事件
@@ -86,58 +87,58 @@ namespace Serial
                 IsPanEnabled = false,
                 Maximum = 100,
                 Minimum = -25,
-                Title = "温度 ℃ / 湿度 %"
+                Title = "温度 ℃ / 湿度 % / 风速 m/s"
             };
             _myPlotModel.Axes.Add(_valueAxis);
 
             //添加标注线，温度上下限和湿度上下限
-            var lineTempMaxAnnotation = new OxyPlot.Annotations.LineAnnotation()
-            {
-                Type = LineAnnotationType.Horizontal,
-                Color = OxyColors.Blue,
-                LineStyle = LineStyle.LongDashDot,
-                Y = 10,
-                Text = "Tmin:10",
-            };
-            _myPlotModel.Annotations.Add(lineTempMaxAnnotation);
+            //var lineTempMaxAnnotation = new OxyPlot.Annotations.LineAnnotation()
+            //{
+            //    Type = LineAnnotationType.Horizontal,
+            //    Color = OxyColors.Blue,
+            //    LineStyle = LineStyle.LongDashDot,
+            //    Y = 10,
+            //    Text = "Tmin:10",
+            //};
+            //_myPlotModel.Annotations.Add(lineTempMaxAnnotation);
 
-            var lineTempMinAnnotation = new LineAnnotation()
-            {
-                Type = LineAnnotationType.Horizontal,
-                Y = 30,
-                Text = "Tmax:30",
-                Color = OxyColors.Red,
-                LineStyle = LineStyle.LongDashDot,
-            };
-            _myPlotModel.Annotations.Add(lineTempMinAnnotation);
+            //var lineTempMinAnnotation = new LineAnnotation()
+            //{
+            //    Type = LineAnnotationType.Horizontal,
+            //    Y = 30,
+            //    Text = "Tmax:30",
+            //    Color = OxyColors.Red,
+            //    LineStyle = LineStyle.LongDashDot,
+            //};
+            //_myPlotModel.Annotations.Add(lineTempMinAnnotation);
 
-            var lineHumiMaxAnnotation = new OxyPlot.Annotations.LineAnnotation()
-            {
-                Type = LineAnnotationType.Horizontal,
-                Color = OxyColors.Red,
-                LineStyle = LineStyle.LongDashDot,
-                Y = 75,
-                Text = "Hmax:75",
-            };
-            _myPlotModel.Annotations.Add(lineHumiMaxAnnotation);
+            //var lineHumiMaxAnnotation = new OxyPlot.Annotations.LineAnnotation()
+            //{
+            //    Type = LineAnnotationType.Horizontal,
+            //    Color = OxyColors.Red,
+            //    LineStyle = LineStyle.LongDashDot,
+            //    Y = 75,
+            //    Text = "Hmax:75",
+            //};
+            //_myPlotModel.Annotations.Add(lineHumiMaxAnnotation);
 
-            var lineHumiMinAnnotation = new LineAnnotation()
-            {
-                Type = LineAnnotationType.Horizontal,
-                Y = 35,
-                Text = "Hmin:35",
-                Color = OxyColors.Blue,
-                LineStyle = LineStyle.LongDashDot,
-            };
-            _myPlotModel.Annotations.Add(lineHumiMinAnnotation);
+            //var lineHumiMinAnnotation = new LineAnnotation()
+            //{
+            //    Type = LineAnnotationType.Horizontal,
+            //    Y = 35,
+            //    Text = "Hmin:35",
+            //    Color = OxyColors.Blue,
+            //    LineStyle = LineStyle.LongDashDot,
+            //};
+            //_myPlotModel.Annotations.Add(lineHumiMinAnnotation);
 
-            //添加两条曲线
+            //添加三条曲线
             var series = new LineSeries()
             {
-                Color = OxyColors.Green,
+                Color = OxyColors.Red,
                 StrokeThickness = 2,
                 MarkerSize = 3,
-                MarkerStroke = OxyColors.DarkGreen,
+                MarkerStroke = OxyColors.IndianRed,
                 MarkerType = MarkerType.Diamond,
                 Title = "温度",
                 Smooth = true
@@ -156,6 +157,18 @@ namespace Serial
             };
             _myPlotModel.Series.Add(series);
 
+            series = new LineSeries()
+            {
+                Color = OxyColors.Green,
+                StrokeThickness = 2,
+                MarkerSize = 3,
+                MarkerStroke = OxyColors.GreenYellow,
+                MarkerType = MarkerType.Star,
+                Title = "风速",
+                Smooth = true
+            };
+            _myPlotModel.Series.Add(series);
+
             //plotView1.Font = Font;
             plotView1.Model = _myPlotModel;
 
@@ -167,21 +180,46 @@ namespace Serial
                     _myPlotModel.Axes[0].Maximum = DateTimeAxis.ToDouble(date.AddSeconds(1));
 
                     var lineSer = plotView1.Model.Series[0] as LineSeries;
-                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), Temperature_Humidity.SendT()));
+                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), THWMethod.SendData().temperature));
                     if (lineSer.Points.Count > 100)
                     {
                         lineSer.Points.RemoveAt(0);
                     }
 
                     lineSer = plotView1.Model.Series[1] as LineSeries;
-                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), Temperature_Humidity.SendH()));
+                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), THWMethod.SendData().humidity));
                     if (lineSer.Points.Count > 100)
                     {
                         lineSer.Points.RemoveAt(0);
                     }
 
-                    _myPlotModel.InvalidatePlot(true);
+                    lineSer = plotView1.Model.Series[2] as LineSeries;
+                    lineSer.Points.Add(new DataPoint(DateTimeAxis.ToDouble(date), THWMethod.SendData().windSpeed));
+                    if (lineSer.Points.Count > 100)
+                    {
+                        lineSer.Points.RemoveAt(0);
+                    }
 
+                    var strSql = "insert into thw_datas (CountSecond,NowTime,Temperature,Humidity,WindDirection,WindSpeed) values (@CountSecond,@NowTime,@Temperature,@Humidity,@WindDirection,@WindSpeed)";
+                    MySqlParameter[] para = new MySqlParameter[]
+                    {
+                        new MySqlParameter("@CountSecond", THWMethod.SendData().countSecond),
+                        new MySqlParameter("@NowTime", DateTime.Now.ToString()),
+                        new MySqlParameter("@Temperature",THWMethod.SendData().temperature),
+                        new MySqlParameter("@Humidity",THWMethod.SendData().humidity),
+                        new MySqlParameter("@WindDirection",THWMethod.SendData().windDirection),
+                        new MySqlParameter("@WindSpeed",THWMethod.SendData().windSpeed)
+                    };
+                    if (!MySQLHelper.Handle(strSql, para))
+                    {
+                        MessageBox.Show("数据库添加失败","警告");
+                    }
+
+                    this.circlePanel.Angle = (float)THWMethod.SendData().windDirection - 90;
+
+                    int count = THWMethod.SendData().countSecond;
+                    this.time_lbl.Text = (count / 3600).ToString() + ":" + (count / 60 % 60).ToString() + ":" + (count % 60).ToString();
+                    _myPlotModel.InvalidatePlot(true);                                   
                     Thread.Sleep(1000);
                 }
             });
@@ -213,11 +251,16 @@ namespace Serial
                 PngExporter png = new PngExporter();
                 png.Background = OxyColors.White;
                 png.Export(plotView1.Model, s);
-                //PngExporter.Export(plotView1.Model, "a.png", 800, 500);
-                //PdfExporter.Export(plotView1.Model, s, 800, 500);
-
+                PngExporter.Export(plotView1.Model, "data.png", 800, 500);
+                PdfExporter.Export(plotView1.Model, s, 800, 500);
             }
         }
         #endregion
+
+        private void mysql_tsb_Click(object sender, EventArgs e)
+        {
+            MysqlFrm mysqlFrm = new MysqlFrm();
+            mysqlFrm.ShowDialog();
+        }
     }
 }

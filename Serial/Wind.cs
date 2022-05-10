@@ -5,19 +5,16 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Serial
 {
-    /// <summary>
-    /// 温度窗体模块待开发
-    /// </summary>
-    public partial class Temperature : Form
-    {        
-        public Temperature()
+    public partial class Wind : Form
+    {
+        public Wind()
         {
             InitializeComponent();
-        }
-        
+        }       
     }
 }

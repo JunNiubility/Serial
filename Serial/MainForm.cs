@@ -26,8 +26,8 @@ namespace Serial
         public MainForm()
         {
             InitializeComponent();
-            Control.CheckForIllegalCrossThreadCalls = false;            
-        }        
+            Control.CheckForIllegalCrossThreadCalls = false;
+        }
         #region 窗体
         /// <summary>
         /// 显示子窗体
@@ -166,7 +166,7 @@ namespace Serial
             baundrate_cbb.Text = "9600";
             check_cbb.Text = "0校验";
             data_cbb.Text = "8";
-            stop_cbb.Text = "1位";            
+            stop_cbb.Text = "1位";
         }
         /// <summary>
         /// 打开按键事件
@@ -181,7 +181,7 @@ namespace Serial
                 {
                     try
                     {
-                        makeSerialPort(serialPort1);                        
+                        makeSerialPort(serialPort1);
                         open_btn.Tag = "false";
                         open_btn.Text = "关闭串口";
                         serialPort1.Open();
@@ -406,7 +406,7 @@ namespace Serial
         /// <param name="e"></param>
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (stop_btn.Tag.ToString() == "false") return;            
+            if (stop_btn.Tag.ToString() == "false") return;
             if (!hexrecieve_cbx.Checked)//如果接受模式为字符模式
             {
                 string str = string.Empty;
@@ -425,8 +425,8 @@ namespace Serial
                     string str = menber.ToString("X2").ToUpper() + " ";
                     recive_tbx.AppendText(str);
                 }
-            }            
-        }        
+            }
+        }
         /// <summary>
         /// Hex选择框接收变化事件事件
         /// </summary>
@@ -566,7 +566,7 @@ namespace Serial
         /// <param name="e"></param>
         private void 温湿度ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Temperature_Humidity temperature_humidityForm = new Temperature_Humidity();
+            THW temperature_humidityForm = new THW();
             ShowChildFormInMDI(temperature_humidityForm, this);
         }
         /// <summary>
@@ -648,5 +648,17 @@ namespace Serial
             ShowChildFormInMDI(temperatureForm, this);
         }
         #endregion
+
+        private void 湿度ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Humidity humidityForm = new Humidity();
+            ShowChildFormInMDI(humidityForm, this);
+        }
+
+        private void 风向风速ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Wind windForm = new Wind();
+            ShowChildFormInMDI(windForm, this);
+        }
     }
 }
